@@ -45,28 +45,44 @@ public class MSGSP {
  		String[] biome = {"Desert","Jungle","Plains","Wetlands"};
 		for(int index=0;index<biome.length;index++) {
 			ArrayList<String> omitPair = new ArrayList<String>();
-			omitPair.add("MP".concat(biome[index]));
-			omitPair.add("P".concat(biome[index]));
+			omitPair.add("MP".concat(":"+biome[index]));
+			omitPair.add("P".concat(":"+biome[index]));
 			this.omitTogether.add(omitPair);
 			omitPair = new ArrayList<String>();
-			omitPair.add("D".concat(biome[index]));
-			omitPair.add("MD".concat(biome[index]));
+			omitPair.add("D".concat(":"+biome[index]));
+			omitPair.add("MD".concat(":"+biome[index]));
 			this.omitTogether.add(omitPair);
 			omitPair = new ArrayList<String>();
-			omitPair.add("MWI".concat(biome[index]));
-			omitPair.add("WI".concat(biome[index]));
+			omitPair.add("MWI".concat(":"+biome[index]));
+			omitPair.add("WI".concat(":"+biome[index]));
 			this.omitTogether.add(omitPair);
 			omitPair = new ArrayList<String>();
-			omitPair.add("MWO".concat(biome[index]));
-			omitPair.add("WO".concat(biome[index]));
+			omitPair.add("MWO".concat(":"+biome[index]));
+			omitPair.add("WO".concat(":"+biome[index]));
 			this.omitTogether.add(omitPair);
 			omitPair = new ArrayList<String>();
-			omitPair.add("MUI".concat(biome[index]));
-			omitPair.add("UI".concat(biome[index]));
+			omitPair.add("MUI".concat(":"+biome[index]));
+			omitPair.add("UI".concat(":"+biome[index]));
 			this.omitTogether.add(omitPair);
 			omitPair = new ArrayList<String>();
-			omitPair.add("MUD".concat(biome[index]));
-			omitPair.add("UD".concat(biome[index]));
+			omitPair.add("MUD".concat(":"+biome[index]));
+			omitPair.add("UD".concat(":"+biome[index]));
+			this.omitTogether.add(omitPair);
+			omitPair = new ArrayList<String>();
+			omitPair.add("MIM");
+			omitPair.add("IM");
+			this.omitTogether.add(omitPair);
+			omitPair = new ArrayList<String>();
+			omitPair.add("MDM");
+			omitPair.add("DM");
+			this.omitTogether.add(omitPair);
+			omitPair = new ArrayList<String>();
+			omitPair.add("MDI".concat(":"+biome[index]));
+			omitPair.add("DI".concat(":"+biome[index]));
+			this.omitTogether.add(omitPair);
+			omitPair = new ArrayList<String>();
+			omitPair.add("MII".concat(":"+biome[index]));
+			omitPair.add("II".concat(":"+biome[index]));
 			this.omitTogether.add(omitPair);
 		}
 	}
@@ -376,6 +392,15 @@ public class MSGSP {
 			String key = LSatisfySupport.get(i);
 			ArrayList<String> temp = new ArrayList<String>();
 			temp.add(key);
+			ArrayList<ArrayList<String>> itemset = new ArrayList<ArrayList<String>>();
+			ArrayList<String> itemCandidate = new ArrayList<String>();
+			//{{x}{x}}  // do we need to include {{y}{y}} as well?
+			itemCandidate.add(key);
+			itemset.add(itemCandidate);
+			itemCandidate = new ArrayList<String>();
+			itemCandidate.add(key);
+			itemset.add(itemCandidate);
+			c2.add(itemset);
 			if (localSupport.get(temp) >= localMIS.get(key)) {
 				for (int j = i + 1; j < LSatisfySupport.size(); j++) {
 					String sub_key = LSatisfySupport.get(j);
@@ -385,8 +410,8 @@ public class MSGSP {
 					if (localSupport.get(tempSatisfy) >= localMIS.get(key)){
 						// && diff <= local_sdc) {
 						//modify with join options 
-						ArrayList<ArrayList<String>> itemset = new ArrayList<ArrayList<String>>();
-						ArrayList<String> itemCandidate = new ArrayList<String>();
+						itemset = new ArrayList<ArrayList<String>>();
+						itemCandidate = new ArrayList<String>();
 						//adds {{x}{y}}
 						itemCandidate.add(key);
 						itemset.add(itemCandidate);
@@ -395,6 +420,8 @@ public class MSGSP {
 						itemset.add(itemCandidate);
 						c2.add(itemset);
 						//adds {{y}{x}}
+						itemset = new ArrayList<ArrayList<String>>();
+						itemCandidate = new ArrayList<String>();
 						itemCandidate.add(sub_key);
 						itemset.add(itemCandidate);
 						itemCandidate = new ArrayList<String>();
@@ -418,7 +445,7 @@ public class MSGSP {
 				c2.remove(new ArrayList<ArrayList<String>>(itemsetc2));
 			}
 		}
-		System.out.println("the candidate:"+c2);
+		System.out.println("This is the candidate:"+c2);
 		return c2;
 	}
 	/***
@@ -519,8 +546,17 @@ public class MSGSP {
 						(ArrayList<ArrayList<ArrayList<String>>>) iteratorF.next();
 				Iterator iteratorItemSet = itemsets.iterator();
 				while(iteratorItemSet.hasNext()) {
-					bw.write(iteratorItemSet.next() +"\n");
+					ArrayList<String> key = (ArrayList<String>) iteratorItemSet.next();
+					bw.write( key+"\n");
 				}
+			}
+			bw.write("supports:\n");
+			Iterator iteratorSupport = this.support.entrySet().iterator();
+			while (iteratorSupport.hasNext()) {
+				Map.Entry pair = (Map.Entry) iteratorSupport.next();
+				ArrayList<String> key =  (ArrayList<String>) pair.getKey();
+				Double value = (Double) pair.getValue();
+				bw.write(key+":"+value+"\n");
 			}
 			bw.close();
 		}
